@@ -56,6 +56,15 @@ class ListViewTest(TestCase):
         })
         self.assertRedirects(response, f'/lists/{correct_list.id}/')
 
+    def test_validation_errors_on_list_page(self):
+        list = List.objects.create()
+        response = self.client.post(f'/lists/{list.id}/', {
+            'item_text': ''
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertContains(response, 'List item must not be empty')
+
 class NewListTest(TestCase):
     def test_can_save_a_post_request(self):
         self.client.post('/lists/new/', {'item_text': 'A new list item'})
