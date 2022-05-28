@@ -10,9 +10,10 @@ def view_list(request, list_id):
     list_ = List.objects.get(id=list_id)
     errorMessage = None
     if request.method == 'POST':
-        item = Item.objects.create(text=request.POST['item_text'], list=list_)
+        item = Item(text=request.POST['item_text'], list=list_)
         try:
             item.full_clean()
+            item.save()
             return redirect(f'/lists/{list_.id}/')
         except ValidationError:
             errorMessage = 'List item must not be empty'
