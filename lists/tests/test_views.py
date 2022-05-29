@@ -1,3 +1,4 @@
+from django.utils.html import escape
 from django.test import TestCase
 from lists.forms import EMPTY_ITEM_ERROR_MESSAGE, ItemForm
 from lists.models import Item, List
@@ -89,6 +90,17 @@ class ListViewTest(TestCase):
         response = self.post_invalid_input()
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, EMPTY_ITEM_ERROR_MESSAGE)
+
+    def test_duplicate_item_error_on_list_page(self):
+        list1 = List.objects.create()
+        Item.objects.create(list=list1, text='My text')
+        response = self.client.post(f'/lists/{list1.id}/', {
+            'text': 'My text'
+        })
+        expected_error = escape('You\'ve already got this in your list')
+        self.assertContains(response, expected_error)
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertEqual(Item.objects.count(), 1)
 
 class NewListTest(TestCase):
     def test_can_save_a_post_request(self):
