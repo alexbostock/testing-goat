@@ -23,6 +23,8 @@ class FunctionalTest(StaticLiveServerTestCase):
                     raise e
                 time.sleep(0.1)
 
+    def get_new_item_input(self):
+        return self.browser.find_element_by_id('id_text')
 
     def assert_row_in_list_table(self, row_text):
         table = self.browser.find_element_by_id('id_list_table')
