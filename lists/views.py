@@ -14,7 +14,7 @@ def view_list(request, list_id):
         try:
             item.full_clean()
             item.save()
-            return redirect(f'/lists/{list_.id}/')
+            return redirect(list_)
         except ValidationError:
             errorMessage = 'List item must not be empty'
     return render(request, 'list.html', {
@@ -32,4 +32,4 @@ def new_list(request):
         return render(request, 'home.html', {
             'error': 'List item must not be empty'
         })
-    return redirect(f'/lists/{list_.id}/')
+    return redirect(list_)
