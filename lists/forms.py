@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from lists.models import Item
 
-DUPLICATE_ITEM_ERROR_MESSAGE = 'Must not be a duplicate'
+DUPLICATE_ITEM_ERROR_MESSAGE = 'You\'ve already got this in your list'
 EMPTY_ITEM_ERROR_MESSAGE = 'List item must not be empty'
 
 class ItemForm(forms.ModelForm):
@@ -34,3 +34,6 @@ class ExistingListItemForm(ItemForm):
         except ValidationError as e:
             e.error_dict = {'text': [DUPLICATE_ITEM_ERROR_MESSAGE]}
             self._update_errors(e)
+
+    def save(self):
+        return forms.models.ModelForm.save(self)
