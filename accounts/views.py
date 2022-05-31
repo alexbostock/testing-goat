@@ -10,8 +10,6 @@ def send_sign_in_email(request):
     uid = uuid.uuid4()
     Token.objects.create(email=email, uid=uid)
     url = request.build_absolute_uri(f'/accounts/sign-in?uid={uid}')
-    print(email)
-    print(url)
     send_mail(
         'Sign in to SuperLists',
         f'Use this link to sign in: {url}',
