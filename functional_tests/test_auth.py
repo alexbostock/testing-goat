@@ -42,3 +42,10 @@ class AuthTest(FunctionalTest):
         navbar = self.browser.find_element_by_css_selector('.navbar')
         self.assertIn(TEST_EMAIL, navbar.text)
 
+        # She signs out.
+        self.browser.find_element_by_link_text('Sign out').click()
+
+        # She is signed out.
+        self.wait_for_assertion(lambda: self.browser.find_element_by_name('email'))
+        navbar = self.browser.find_element_by_css_selector('.navbar')
+        self.assertNotIn(TEST_EMAIL, navbar.text)
