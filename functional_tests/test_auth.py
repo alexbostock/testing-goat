@@ -36,16 +36,10 @@ class AuthTest(FunctionalTest):
         self.browser.get(url)
 
         # She is signed in.
-        self.wait_for_assertion(
-            lambda: self.browser.find_element_by_link_text('Sign out')
-        )
-        navbar = self.browser.find_element_by_css_selector('.navbar')
-        self.assertIn(TEST_EMAIL, navbar.text)
+        self.wait_to_be_logged_in(TEST_EMAIL)
 
         # She signs out.
         self.browser.find_element_by_link_text('Sign out').click()
 
         # She is signed out.
-        self.wait_for_assertion(lambda: self.browser.find_element_by_name('email'))
-        navbar = self.browser.find_element_by_css_selector('.navbar')
-        self.assertNotIn(TEST_EMAIL, navbar.text)
+        self.wait_to_be_logged_out(TEST_EMAIL)
