@@ -42,10 +42,7 @@ class NewVisitorTest(FunctionalTest):
     def test_multiple_users_can_start_separate_lists_at_different_urls(self):
         # Edith starts a new list
         self.browser.get(self.live_server_url)
-        input = self.get_new_item_input()
-        input.send_keys('Buy peacock feathers')
-        input.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Buy peacock feathers')
+        self.add_list_item('Buy peacock feathers')
 
         # Edith notices that her list has a unique URL
         edith_url = self.browser.current_url
@@ -61,10 +58,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertNotIn('Buy peacock feathers', page_text)
 
         # Francis starts a list
-        input = self.get_new_item_input()
-        input.send_keys('Buy milk')
-        input.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Buy milk')
+        self.add_list_item('Buy milk')
 
         # Francis gets a unique URL
         francis_url = self.browser.current_url

@@ -46,9 +46,7 @@ class ItemValidationtest(FunctionalTest):
     def test_cannot_add_duplicate_items(self):
         # Edith creates a list with one item.
         self.browser.get(self.live_server_url)
-        self.get_new_item_input().send_keys('Go fishing')
-        self.get_new_item_input().send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Go fishing')
+        self.add_list_item('Go fishing')
 
         # She accidentally tries to enter a duplicate item.
         self.get_new_item_input().send_keys('Go fishing')
@@ -63,9 +61,7 @@ class ItemValidationtest(FunctionalTest):
     def test_error_messages_are_cleared_on_input(self):
         # Edith starts a list and causes a validation error.
         self.browser.get(self.live_server_url)
-        self.get_new_item_input().send_keys('Banter too thick')
-        self.get_new_item_input().send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Banter too thick')
+        self.add_list_item('Banter too thick')
         self.get_new_item_input().send_keys('Banter too thick')
         self.get_new_item_input().send_keys(Keys.ENTER)
 

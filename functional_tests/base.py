@@ -1,10 +1,11 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.keys import Keys
 import time
 from unittest import skip
 
-MAX_WAIT = 5
+MAX_WAIT = 10
 
 def wait(fn):
     def modified_fn(*args, **kwargs):
@@ -49,3 +50,10 @@ class FunctionalTest(StaticLiveServerTestCase):
     @wait
     def wait_for_assertion(self, fn):
         fn()
+
+    def add_list_item(self, item_text):
+        num_rows = len(self.browser.find_elements_by_css_selector('#id_list_table tr'))
+        self.get_new_item_input().send_keys(item_text)
+        self.get_new_item_input().send_keys(Keys.ENTER)
+        item_number = num_rows + 1
+        self.wait_for_row_in_list_table(f'{item_number}: {item_text}')
