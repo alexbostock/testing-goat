@@ -135,3 +135,8 @@ class NewListTest(TestCase):
         list_ = List.objects.create()
         response = self.client.post(f'/lists/{list_.id}/', data={'text': ''})
         self.assertEqual(Item.objects.count(), 0)
+
+class MyListsViewTest(TestCase):
+    def test_my_lists_url_renders_my_lists_template(self):
+        response = self.client.get('/lists/users/a@b.com/')
+        self.assertTemplateUsed(response, 'my_lists.html')
