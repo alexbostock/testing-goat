@@ -36,9 +36,9 @@ class MyListsTest(FunctionalTest):
 
         # She sees her list is there, labelled by its first item.
         self.wait_for_assertion(
-            lambda: self.browser.find_element_by_link_text('Reticulate spines')
+            lambda: self.browser.find_element_by_link_text('Reticulate splines')
         )
-        self.browser.find_element_by_link_text('Reticulate spines').click()
+        self.browser.find_element_by_link_text('Reticulate splines').click()
         self.wait_for_assertion(
             lambda: self.assertEqual(self.browser.current_url, first_list_url)
         )
@@ -53,11 +53,11 @@ class MyListsTest(FunctionalTest):
             lambda: self.browser.find_element_by_link_text('My Lists').click()
         )
         self.wait_for_assertion(
-            lambda: self.browser.find_element_by_link_text('Reticulate spines')
+            lambda: self.browser.find_element_by_link_text('Reticulate splines')
         )
         self.browser.find_element_by_link_text('Click cows').click()
         self.wait_for_assertion(
-            self.assertEqual(self.browser.current_url, second_list_url)
+            lambda: self.assertEqual(self.browser.current_url, second_list_url)
         )
 
         # She logs out. The My Lists option disappears.
