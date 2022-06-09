@@ -7,7 +7,7 @@ from django.utils.html import escape
 from django.test import TestCase
 from lists.forms import *
 from lists.models import Item, List
-from lists.views import new_list, view_list
+from lists.views import new_list, share_list
 User = get_user_model()
 
 class HomePageTest(TestCase):
@@ -23,7 +23,7 @@ class HomePageTest(TestCase):
         self.client.get('/')
         self.assertEqual(Item.objects.count(), 0)
 
-class ListViewTest(TestCase):
+class ListViewIntegratedTests(TestCase):
     def post_invalid_input(self):
         list = List.objects.create()
         return self.client.post(f'/lists/{list.id}/', {
@@ -108,6 +108,58 @@ class ListViewTest(TestCase):
         self.assertContains(response, expected_error)
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.count(), 1)
+
+    @skip
+    def test_can_share_list(self):
+        user1 = User.objects.create(email='a@example.com')
+        user2 = User.objects.create(email='b@example.com')
+        list_ = List.create_new(first_item_text='Eat breakfast', owner=user1)
+        self.client.post(f'/lists/{list_.id}/share/', {'sharee': user2.pk})
+        self.assertEqual(list_.sharees.count(), 1)
+        self.assertEqual(list_.sharees.first(), user2)
+
+@patch('lists.views.ShareForm')
+class ListViewSharingUnitTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.list_ = List.create_new(first_item_text='First item')
+        self.request = HttpRequest()
+        self.request.path = 'f/lists/{self.list_.id}/share/'
+        self.request.POST['sharee'] = 'b@example.com'
+
+    def test_passes_post_data_to_form(self, MockShareForm):
+        share_list(self.request, list=self.list_)
+        MockShareForm.assert_called_once_with(data=self.request.POST)
+
+    def test_form_saved_if_valid(self, MockShareForm):
+        mock_form = MockShareForm.return_value
+        mock_form.is_valid.return_value = True
+        share_list(self.request, list=self.list_)
+        mock_form.save.assert_called_once_with()
+
+    @patch('lists.views.redirect')
+    def test_redirects_if_valid(self, mockRedirect, MockShareForm):
+        mock_form = MockShareForm.return_value
+        mock_form.is_valid.return_value = True
+        response = share_list(self.request, list=self.list_)
+        self.assertEqual(response, mockRedirect.return_value)
+        mockRedirect.assert_called_once_with(self.list_)
+
+    def test_does_not_save_if_invalid(self, MockShareForm):
+        mock_form = MockShareForm.return_value
+        mock_form.is_valid.return_value = False
+        share_list(self.request, list=self.list_)
+        mock_form.save.assert_not_called()
+
+    @patch('lists.views.render')
+    def test_list_object_displayed_if_invalid(self, mockRender, MockShareForm):
+        mock_form = MockShareForm.return_value
+        mock_form.is_valid.return_value = False
+        response = share_list(self.request, list=self.list_)
+        self.assertEqual(response, mockRender.return_value)
+        mockRender.assert_called_once_with(self.request, 'list.html', {
+            'list': self.list_,
+            'form': mock_form,
+        })
 
 class NewListViewIntegratedTest(TestCase):
     def test_can_save_a_post_request(self):

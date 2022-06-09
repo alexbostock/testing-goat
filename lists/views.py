@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
-from lists.forms import ItemForm, ExistingListItemForm, NewListForm
+from lists.forms import ItemForm, ExistingListItemForm, NewListForm, ShareForm
 from lists.models import Item, List
 User = get_user_model()
 
@@ -29,6 +29,17 @@ def new_list(request):
         return redirect(list_)
     else:
         return render(request, 'home.html', {
+            'form': form,
+        })
+
+def share_list(request, list):
+    form = ShareForm(data=request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect(list)
+    else:
+        return render(request, 'list.html', {
+            'list': list,
             'form': form,
         })
 
